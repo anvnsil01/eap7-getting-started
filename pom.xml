@@ -27,7 +27,7 @@
     </parent>
 
     <groupId>org.jboss.eap.openshift.quickstarts</groupId>
-    <artifactId>eap-openshift-quickstart-helloworld</artifactId>
+    <artifactId>eap8-openshift-quickstart-helloworld</artifactId>
     <version>1.0.0.Final-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Quickstart: helloworld</name>
@@ -42,21 +42,41 @@
     </licenses>
 
     <properties>
-        <version.server.bom>7.4.9.GA</version.server.bom>
+        <!-- The versions for BOMs, Dependencies and Plugins -->
+        <version.server.bom>8.0.0.GA-redhat-00009</version.server.bom>
+        <version.eap.maven.plugin>1.0.0.Final-redhat-00014</version.eap.maven.plugin>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!-- importing the jboss-eap-jakartaee8-with-tools BOM adds specs and other useful artifacts as managed dependencies -->
+            <!-- importing the jboss-eap-ee BOM adds specs and other useful artifacts as managed dependencies -->
             <dependency>
                 <groupId>org.jboss.bom</groupId>
-                <artifactId>jboss-eap-jakartaee8-with-tools</artifactId>
+                <artifactId>jboss-eap-ee</artifactId>
                 <version>${version.server.bom}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <profiles>
         <profile>
@@ -74,6 +94,40 @@
                             <warName>ROOT</warName>
                         </configuration>
                     </plugin>
+                    <plugin>
+                        <groupId>org.jboss.eap.plugins</groupId>
+                        <artifactId>eap-maven-plugin</artifactId>
+                        <version>${version.eap.maven.plugin}</version>
+                        <configuration>
+                            <channels>
+                                <channel>
+                                    <manifest>
+                                        <groupId>org.jboss.eap.channels</groupId>
+                                        <artifactId>eap-8.0</artifactId>
+                                    </manifest>
+                                </channel>
+                            </channels>
+                            <feature-packs>
+                                <feature-pack>
+                                    <location>org.jboss.eap:wildfly-ee-galleon-pack</location>
+                                </feature-pack>
+                                <feature-pack>
+                                    <location>org.jboss.eap.cloud:eap-cloud-galleon-pack</location>
+                                </feature-pack>
+                            </feature-packs>
+                            <layers>
+                                <layer>cloud-server</layer>
+                            </layers>
+                            <filename>ROOT.war</filename>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>package</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -86,6 +140,11 @@
             <url>https://maven.repository.redhat.com/ga/</url>
         </repository>
         <repository>
+            <id>jboss-enterprise-ea-maven-repository</id>
+            <name>JBoss Enterprise Maven Repository Early Access</name>
+            <url>https://maven.repository.redhat.com/earlyaccess/all/</url>
+        </repository>
+        <repository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Repository Group</name>
             <url>https://repository.jboss.org/nexus/content/groups/public</url>
@@ -93,6 +152,11 @@
     </repositories>
 
     <pluginRepositories>
+        <pluginRepository>
+            <id>jboss-enterprise-ea-maven-repository</id>
+            <name>JBoss Enterprise Maven Repository Early Access</name>
+            <url>https://maven.repository.redhat.com/earlyaccess/all/</url>
+        </pluginRepository>
         <pluginRepository>
             <id>jboss-enterprise-maven-repository</id>
             <name>JBoss Enterprise Maven Repository</name>
@@ -104,23 +168,4 @@
             <url>https://repository.jboss.org/nexus/content/groups/public</url>
         </pluginRepository>
     </pluginRepositories>
-
-    <dependencies>
-        <dependency>
-            <groupId>jakarta.enterprise</groupId>
-            <artifactId>jakarta.enterprise.cdi-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.annotation</groupId>
-            <artifactId>jboss-annotations-api_1.3_spec</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.ws.rs</groupId>
-            <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
-
 </project>
